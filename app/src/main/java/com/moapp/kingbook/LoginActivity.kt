@@ -15,6 +15,8 @@ import com.google.android.gms.common.SignInButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_login.*
 
 
@@ -31,15 +33,19 @@ class LoginActivity : AppCompatActivity() {
     var waitTime = 0L
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login);
         //init
         auth = FirebaseAuth.getInstance()
 
-        val intent = Intent(applicationContext, SplashActivity::class.java)
+        val intent = Intent(applicationContext, TabActivity::class.java)
         startActivity(intent)
+
+        // db에 값 넣기
+        val database = Firebase.database
+        val myRef = database.getReference("message")
+        myRef.setValue("Hello, World!")
 
         title = "로그인 화면"
 
@@ -82,6 +88,8 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "성공", Toast.LENGTH_SHORT).show()
             }
             else{
+                val intent = Intent(this, TabActivity::class.java)
+                startActivity(intent)
                 Toast.makeText(this, "실패", Toast.LENGTH_SHORT).show()
             }
         }
@@ -105,7 +113,7 @@ class LoginActivity : AppCompatActivity() {
     // 유저정보 넘겨주고 메인 액티비티 호출
     fun moveMainPage(user: FirebaseUser?){
         if( user!= null){
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, TabActivity::class.java)
             startActivity(intent)
             finish()
         }
