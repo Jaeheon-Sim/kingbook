@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab_home"
+        android:enabled="true"
+        android:title="HOME"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/tab_search"
+        android:enabled="true"
+        android:title="SEARCH"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/tab_mypage"
+        android:enabled="true"
+        android:title="MYPAGE"
+        app:showAsAction="ifRoom" />
+</menu>

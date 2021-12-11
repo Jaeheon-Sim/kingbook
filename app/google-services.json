@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "305159545485",
+    "firebase_url": "https://kingbookdb-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "kingbookdb",
+    "storage_bucket": "kingbookdb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305159545485:android:a9b1ccaff45414385bf8c4",
+        "android_client_info": {
+          "package_name": "com.moapp.kingbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "305159545485-7bn6lrmu1org4dcs0nehavbuon4fhok6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.moapp.kingbook",
+            "certificate_hash": "cd224a13a00d7b19dc1337ecdc1cfaba7de88a9f"
+          }
+        },
+        {
+          "client_id": "305159545485-puqvcbllfglp8mtp7nddktfaict2pgdd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.moapp.kingbook",
+            "certificate_hash": "164b65361c1b2b4f6c0af06c3bc1b2684c0c170d"
+          }
+        },
+        {
+          "client_id": "305159545485-f26ojj13q8p85lpeh99gvlt6bbm9n7o5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwm8_Joj_OQ2k4_zGXJCl7iSm9ZC8G9P4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "305159545485-f26ojj13q8p85lpeh99gvlt6bbm9n7o5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
