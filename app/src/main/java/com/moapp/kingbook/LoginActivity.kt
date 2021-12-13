@@ -43,17 +43,6 @@ class LoginActivity : AppCompatActivity() {
 
         title = "로그인 화면"
 
-//        button1 = findViewById(R.id.Button1)
-//        button2 = findViewById(R.id.Button2)
-//
-//        id = findViewById(R.id.Edit1)
-//        password = findViewById(R.id.Edit2)
-//
-//        Button1.setOnClickListener {
-//            val intent = Intent(this, TabActivity::class.java)
-//            startActivity(intent)
-//        }
-
         var google_sign_in_button = findViewById<SignInButton>(R.id.login_button)
 
         login_button.setOnClickListener { googleLogin() }
@@ -105,7 +94,7 @@ class LoginActivity : AppCompatActivity() {
     // 유저정보 넘겨주고 메인 액티비티 호출
     fun moveMainPage(user: FirebaseUser?){
         if( user!= null){
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, TabActivity::class.java)
             startActivity(intent)
             finish()
         }
