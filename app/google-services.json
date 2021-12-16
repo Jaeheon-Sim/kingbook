@@ -1,41 +1,42 @@
 {
   "project_info": {
-    "project_number": "690569827021",
-    "project_id": "lasbetalk-ee868",
-    "storage_bucket": "lasbetalk-ee868.appspot.com"
+    "project_number": "978503109192",
+    "firebase_url": "https://helpme-378f8-default-rtdb.firebaseio.com",
+    "project_id": "helpme-378f8",
+    "storage_bucket": "helpme-378f8.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:690569827021:android:0b339eafb3f3c2bae4cf84",
+        "mobilesdk_app_id": "1:978503109192:android:2787799f7f885a13a2e67d",
         "android_client_info": {
           "package_name": "com.example.lasbetalk"
         }
       },
       "oauth_client": [
         {
-          "client_id": "690569827021-gsm714gaid2vi1thvj6pf9t06ma5ad8g.apps.googleusercontent.com",
+          "client_id": "978503109192-5p08uqur1tf0oetum3pi50oegckcjjig.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.lasbetalk",
-            "certificate_hash": "146dbec0b50008cea10e7d4a4f672ca5ed935f06"
+            "certificate_hash": "cd224a13a00d7b19dc1337ecdc1cfaba7de88a9f"
           }
         },
         {
-          "client_id": "690569827021-uiu9pvd3b8q7fj3umigcbrmsave3p3pp.apps.googleusercontent.com",
+          "client_id": "978503109192-ellcsm6br0ip6an804i3o3kvv3km42ae.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBu2O794P2ZKEz1HkNCVf2gMYnPJaHET8k"
+          "current_key": "AIzaSyBsld44V254AfeWhbrynPfaYJv_h4WpwjQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "690569827021-uiu9pvd3b8q7fj3umigcbrmsave3p3pp.apps.googleusercontent.com",
+              "client_id": "978503109192-ellcsm6br0ip6an804i3o3kvv3km42ae.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

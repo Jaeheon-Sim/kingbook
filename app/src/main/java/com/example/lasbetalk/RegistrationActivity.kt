@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.activity_registration.*
 
 
 private lateinit var auth: FirebaseAuth
-lateinit var database: DatabaseReference
+//lateinit var database: DatabaseReference
 
 @Suppress("DEPRECATION")
 class RegistrationActivity: AppCompatActivity() {
@@ -49,7 +49,7 @@ class RegistrationActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
         auth = Firebase.auth
-        database = Firebase.database.reference
+        //database = Firebase.database.reference
 
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
 
@@ -93,15 +93,30 @@ class RegistrationActivity: AppCompatActivity() {
                                                     .addOnSuccessListener {
                                                         userProfile = it
                                                         Log.d("이미지 URL", "$userProfile")
-                                                        val friend = Friend(email.toString(), name.toString(), userProfile.toString(), userIdSt)
-                                                        database.child("users").child(userId.toString()).setValue(friend)
+                                                      //  val friend = Friend(email.toString(), name.toString(), userProfile.toString(), userIdSt)
+                                                        //database.child("users").child(userId.toString()).setValue(friend)
                                                     }
                                         }
                                 Toast.makeText(this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                                 Log.e(TAG, "$userId")
                                 startActivity(intent)
                             } else {
-                                Toast.makeText(this, "등록에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                                val user = Firebase.auth.currentUser
+                                val userId = user?.uid
+                                val userIdSt = userId.toString()
+                                FirebaseStorage.getInstance()
+                                    .reference.child("userImages").child("$userIdSt/photo").putFile(imageUri!!).addOnSuccessListener {
+                                        var userProfile: Uri? = null
+                                        FirebaseStorage.getInstance().reference.child("userImages").child("$userIdSt/photo").downloadUrl
+                                            .addOnSuccessListener {
+                                                userProfile = it
+                                                Log.d("이미지 URL", "$userProfile")
+                                 //               val friend = Friend(email.toString(), name.toString(), userProfile.toString(), userIdSt)
+                                   //             database.child("users").child(userId.toString()).setValue(friend)
+                                            }
+                                    }
+                                startActivity(intent)
+                                //Toast.makeText(this, "등록에 실패했습니다.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

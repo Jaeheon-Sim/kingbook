@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.lasbetalk.R
-import com.example.lasbetalk.database
+//import com.example.lasbetalk.database
 import com.example.lasbetalk.model.Friend
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot

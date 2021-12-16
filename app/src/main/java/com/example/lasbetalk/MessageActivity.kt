@@ -152,10 +152,7 @@ class MessageActivity : AppCompatActivity() {
                 holder.layout_destination.visibility = View.INVISIBLE
                 holder.layout_main.gravity = Gravity.RIGHT
             }else{ // 상대방 채팅
-                Glide.with(holder.itemView.context)
-                        .load(friend?.profileImageUrl)
-                        .apply(RequestOptions().circleCrop())
-                        .into(holder.imageView_profile)
+
                 holder.textView_name.text = friend?.name
                 holder.layout_destination.visibility = View.VISIBLE
                 holder.textView_name.visibility = View.VISIBLE
