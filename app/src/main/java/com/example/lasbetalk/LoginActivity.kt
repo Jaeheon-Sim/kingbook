@@ -39,6 +39,7 @@ class LoginActivity: AppCompatActivity() {
     lateinit var database: DatabaseReference
     private var googleSignInClient : GoogleSignInClient? = null
     private var GOOGLE_LOGIN_CODE = 9001
+    lateinit var intentMain: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +59,6 @@ class LoginActivity: AppCompatActivity() {
 
     }
 
-
     fun googleLogin(){
         var signInIntent = googleSignInClient?.signInIntent
         startActivityForResult(signInIntent, GOOGLE_LOGIN_CODE)
@@ -66,26 +66,46 @@ class LoginActivity: AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
         if(requestCode == GOOGLE_LOGIN_CODE){
             // 구글API가 넘겨주는 값 받아옴
             var result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)!!
 
+            // 구글 로그인 성공
             if(result.isSuccess)
             {
-                var accout = result.signInAccount
-                firebaseAuthWithGoogle(accout)
-                Toast.makeText(this, "성공", Toast.LENGTH_SHORT).show()
+                var account = result.signInAccount
+                var user = auth?.currentUser
+
+                // 기존 유저
+                if(user != null)
+                {
+                    intentMain = Intent(this, MainActivity::class.java)
+                    updateUI(user)
+                    finish()
+                    startActivity(intentMain)
+                    Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
+                }
+                // 신규 회원
+                else
+                {
+                    // 회원 등록
+                    firebaseAuthWithGoogle(account)
+                    Toast.makeText(this, "회원이 등록되었습니다.", Toast.LENGTH_SHORT).show()
+                }
             }
+            // 구글 로그인 실패
             else
             {
                 val intent = Intent(this, MessageActivity::class.java)
                 startActivity(intent)
                 /////finish()
-                Toast.makeText(this, "실패", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    // 파이어베이스에 유저 정보를 저장하는 함수
     fun firebaseAuthWithGoogle(account: GoogleSignInAccount?){
         var credential = GoogleAuthProvider.getCredential(account?.idToken, null)
 
@@ -100,6 +120,8 @@ class LoginActivity: AppCompatActivity() {
                     val userId = user?.uid
                     val userIdSt = userId.toString()
                     val user_uid = user?.uid
+                    intentMain = Intent(this, MainActivity::class.java)
+
                     Log.d("g.email", "$email")
                     Log.d("g.photo", "$imageUrl")
                     Log.d("g.id", "$user_uid")
@@ -134,7 +156,9 @@ class LoginActivity: AppCompatActivity() {
                                                 Toast.makeText(applicationContext, "fail", Toast.LENGTH_LONG).show()
                                             }
 
-                                        moveMainPage(task.result?.user)
+                                        updateUI(user)
+                                        finish()
+                                        startActivity(intentMain)
                                     }
                                 Log.d("bytedata", "111111")
 
@@ -145,38 +169,36 @@ class LoginActivity: AppCompatActivity() {
                             }
                         })
 
-//                    FirebaseStorage.getInstance()
-//                        .reference.child("userImages").child("$userIdSt/photo").putBytes(data!!).addOnSuccessListener {
-//                            var userProfile: Uri? = null
-//                            FirebaseStorage.getInstance().reference.child("userImages").child("$userIdSt/photo").downloadUrl
-//                                .addOnSuccessListener {
-//                                    userProfile = it
-//
-//                                    val friend = Friend(email.toString(), name.toString(), userProfile.toString(), userIdSt)
-//                                    database.child("users").child(userId.toString()).setValue(friend)
-//                                }
-//                                moveMainPage(task.result?.user)
-//                        }
-
 //                    moveMainPage(task.result?.user)
 
-                   // Toast.makeText(LoginActivity.this, "success", Toast.LENGTH_SHORT).show()
-                }else{
+                   // Toast.makeText(LoginActivity.this, "success", Toast.LENGTH_SHORT).show(
+                }
+                else
+                {
                     // 틀렸을 때
                     //moveMainPage(task.result?.user)
                     //test
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                    updateUI(null)
                 }
             }
     }
 
-    // 유저정보 넘겨주고 메인 액티비티 호출
-    fun moveMainPage(user: FirebaseUser?){
-        if( user!= null){
-            val intent = Intent(this, MessageActivity::class.java)
-            startActivity(intent)
-            finish()
+    private fun updateUI(user: FirebaseUser?) {
+
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth?.currentUser
+        if(currentUser != null){
+            reload();
         }
+    }
+
+    private fun reload() {
+
     }
 
 
