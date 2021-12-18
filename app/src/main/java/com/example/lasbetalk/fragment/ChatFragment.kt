@@ -84,7 +84,7 @@ class ChatFragment : Fragment() {
             println(uid)
 
             // 사용자가 참여한 토론방의 key인 ISBN을 찾아서 books 배열에 저장
-            fireDatabase.child("chatrooms").orderByChild("users/$uid").addListenerForSingleValueEvent(object : ValueEventListener{
+            fireDatabase.child("chatrooms").orderByChild("users/$uid").equalTo(true).addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onCancelled(error: DatabaseError) {
                 }
                 override fun onDataChange(snapshot: DataSnapshot) {
