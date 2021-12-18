@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.example.lasbetalk.model.Book
 import com.example.lasbetalk.model.ChatModel
 import com.example.lasbetalk.model.ChatModel.Comment
 import com.example.lasbetalk.model.Friend
@@ -32,8 +33,7 @@ import kotlin.collections.ArrayList
 class MessageActivity : AppCompatActivity() {
 
     private val fireDatabase = FirebaseDatabase.getInstance().reference
-    private var chatRoomUid : String? = null
-    private var destinationUid : String? = null
+    private var chatRoomIsbn : String? = null
     private var uid : String? = null
     private var recyclerView : RecyclerView? = null
 
@@ -41,118 +41,135 @@ class MessageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
+
         val imageView = findViewById<ImageView>(R.id.messageActivity_ImageView)
         val editText = findViewById<TextView>(R.id.messageActivity_editText)
 
-        //메세지를 보낸 시간
+        // 메세지를 보낸 시간
         val time = System.currentTimeMillis()
         val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
         val curTime = dateFormat.format(Date(time)).toString()
 
-        destinationUid = intent.getStringExtra("destinationUid")
+        // 토론방 ISBN 초기화
+        chatRoomIsbn = intent.getStringExtra("chatroomISBN")
         uid = Firebase.auth.currentUser?.uid.toString()
         recyclerView = findViewById(R.id.messageActivity_recyclerview)
 
-        imageView.setOnClickListener {
-            Log.d("클릭 시 dest", "$destinationUid")
-            val chatModel = ChatModel()
-            chatModel.users.put(uid.toString(), true)
-            chatModel.users.put(destinationUid!!, true)
+        recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
+        recyclerView?.adapter = RecyclerViewAdapter()
+
+
+        // 전송버튼을 눌렀을 때
+        imageView.setOnClickListener{
+            messageActivity_ImageView.isEnabled = true
+
+            // 토론방 users에 내 uid 추가
+            fireDatabase.child("chatrooms").child(chatRoomIsbn.toString()).child("users").child(uid.toString()).setValue(true)
 
             val comment = Comment(uid, editText.text.toString(), curTime)
-            if(chatRoomUid == null){
-                imageView.isEnabled = false
-                fireDatabase.child("chatrooms").push().setValue(chatModel).addOnSuccessListener {
-                    //채팅방 생성
-                    checkChatRoom()
-                    //메세지 보내기
-                    Handler().postDelayed({
-                        println(chatRoomUid)
-                        fireDatabase.child("chatrooms").child(chatRoomUid.toString()).child("comments").push().setValue(comment)
-                        messageActivity_editText.text = null
-                    }, 1000L)
-                    Log.d("chatUidNull dest", "$destinationUid")
-                }
-            }else{
-                fireDatabase.child("chatrooms").child(chatRoomUid.toString()).child("comments").push().setValue(comment)
-                messageActivity_editText.text = null
-                Log.d("chatUidNotNull dest", "$destinationUid")
-            }
+
+            // 내 comment 추가하기
+            fireDatabase.child("chatrooms").child(chatRoomIsbn.toString()).child("comments").push().setValue(comment)
+            messageActivity_editText.text = null
+            messageActivity_ImageView.isEnabled = true
+
+            // 토론방 내용 업데이트
+            recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
+            recyclerView?.adapter = RecyclerViewAdapter()
         }
-        checkChatRoom()
     }
 
-    private fun checkChatRoom(){
-        fireDatabase.child("chatrooms").orderByChild("users/$uid").equalTo(true)
-                .addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onCancelled(error: DatabaseError) {
-            }
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (item in snapshot.children){
-                    println(item)
-                    val chatModel = item.getValue<ChatModel>()
-                    if(chatModel?.users!!.containsKey(destinationUid)){
-                        chatRoomUid = item.key
-                        messageActivity_ImageView.isEnabled = true
-                        recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
-                        recyclerView?.adapter = RecyclerViewAdapter()
-                    }
-                }
-            }
-        })
-    }
-
-    inner class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.MessageViewHolder>() {
-
+    // 리사이클러뷰 어뎁터
+    inner class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.MessageViewHolder>()
+    {
         private val comments = ArrayList<Comment>()
         private var friend : Friend? = null
+        private var book : Book? = null
+
         init{
-            fireDatabase.child("users").child(destinationUid.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
+            // 토론방의 책 정보를 받아오기
+            fireDatabase.child("BOOK").child("BESTSELLER").child(chatRoomIsbn.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onCancelled(error: DatabaseError) {
+                    Log.d("book","fail")
                 }
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    friend = snapshot.getValue<Friend>()
-                    messageActivity_textView_topName.text = friend?.name
+                override fun onDataChange(snapshot: DataSnapshot)
+                {
+                    // 토론방 상단에 책 title 출력
+                    book = snapshot.getValue<Book>()
+                    messageActivity_textView_topName.text = book?.title
+                    Log.d("book","success")
                     getMessageList()
                 }
             })
         }
 
+        // 메세지 리스트 받아오기
         fun getMessageList(){
-            fireDatabase.child("chatrooms").child(chatRoomUid.toString()).child("comments").addValueEventListener(object : ValueEventListener{
-                override fun onCancelled(error: DatabaseError) {
+            fireDatabase.child("chatrooms").child(chatRoomIsbn.toString()).child("comments").addValueEventListener(object : ValueEventListener{
+                override fun onCancelled(error: DatabaseError)
+                {
+                    Log.d("book","fail")
                 }
-                override fun onDataChange(snapshot: DataSnapshot) {
+                override fun onDataChange(snapshot: DataSnapshot)
+                {
                     comments.clear()
-                    for(data in snapshot.children){
+                    for(data in snapshot.children)
+                    {
+                        // Comment 객체를 받와와서 comments 배열에 저장
                         val item = data.getValue<Comment>()
                         comments.add(item!!)
                         println(comments)
                     }
                     notifyDataSetChanged()
+
                     //메세지를 보낼 시 화면을 맨 밑으로 내림
                     recyclerView?.scrollToPosition(comments.size - 1)
+                    Log.d("book","success")
                 }
             })
         }
 
+        // 뷰 홀더 생성
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
             val view : View = LayoutInflater.from(parent.context).inflate(R.layout.item_message, parent, false)
-
             return MessageViewHolder(view)
         }
+
+        // 뷰 홀더 속성
         @SuppressLint("RtlHardcoded")
-        override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: MessageViewHolder, position: Int)
+        {
             holder.textView_message.textSize = 20F
             holder.textView_message.text = comments[position].message
             holder.textView_time.text = comments[position].time
-            if(comments[position].uid.equals(uid)){ // 본인 채팅
+
+            // 본인 채팅
+            if(comments[position].uid.equals(uid))
+            {
                 holder.textView_message.setBackgroundResource(R.drawable.rightbubble)
                 holder.textView_name.visibility = View.INVISIBLE
                 holder.layout_destination.visibility = View.INVISIBLE
                 holder.layout_main.gravity = Gravity.RIGHT
-            }else{ // 상대방 채팅
-
+            }
+            // 상대방 채팅
+            else
+            {
+                fireDatabase.child("users").child(comments[position].uid.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.d("viewww","fail")
+                    }
+                    override fun onDataChange(snapshot: DataSnapshot)
+                    {
+                        // comment를 보낸 상대방 정보 friend에 저장
+                        friend = snapshot.getValue<Friend>()
+                        Log.d("viewww","success")
+                    }
+                })
+                // friend의 프로필 사진 및 기타 정보 출력
+                GlideApp.with(holder.itemView.context)
+                        .load(friend?.profileImageUrl)
+                        .apply(RequestOptions().circleCrop())
+                        .into(holder.imageView_profile)
                 holder.textView_name.text = friend?.name
                 holder.layout_destination.visibility = View.VISIBLE
                 holder.textView_name.visibility = View.VISIBLE
@@ -161,6 +178,7 @@ class MessageActivity : AppCompatActivity() {
             }
         }
 
+        // 메세지 뷰 홀더 속성
         inner class MessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val textView_message: TextView = view.findViewById(R.id.messageItem_textView_message)
             val textView_name: TextView = view.findViewById(R.id.messageItem_textview_name)
