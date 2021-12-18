@@ -1,4 +1,3 @@
-
 # KINGBOOK
 # 교보문고의 주간베스트 20의 데이터를 크롤링해와서 파이어베이스에 저장하는 프로그램.
 
@@ -9,7 +8,6 @@ from urllib.request import urlopen, urlretrieve
 from bs4 import BeautifulSoup
 from firebase_admin import db
 from firebase_admin import credentials, initialize_app, storage
-
 
 # 파이어베이스 주소 저장
 db_url = 'https://helpme-378f8-default-rtdb.firebaseio.com/'
@@ -25,7 +23,7 @@ soup = BeautifulSoup(html, "html.parser")
 
 date = soup.find('div', "content_middle").find('h4', "title_best_basic").find('small').text.strip()
 sep_date = re.findall("\d+", date)
-mmdd = sep_date[1]+sep_date[2]
+mmdd = sep_date[1] + sep_date[2]
 # print(mmdd)
 
 # 책의 상세 웹페이지 주소를 추출하여 리스트에 저장합니다.
@@ -48,11 +46,15 @@ for index, book_page_url in enumerate(book_page_urls):
 
     # 작가
     authors = soup.select('div.author > span.name > a')
-    author = []
+    a_list = []
     for name in authors:
         src = name.text.strip()
-        author.append(src)
-    author.pop()
+        a_list.append(src)
+    a_list.pop()
+
+    author = ""
+    for n in a_list:
+        author = author + n + ' '
 
     # 출판사
     publisher = src
@@ -70,6 +72,10 @@ for index, book_page_url in enumerate(book_page_urls):
     for t in tag_list:
         T = t.text.strip()
         tag.append(T)
+
+    tags = ""
+    for t in tag:
+        tags = tags + t + ' '
 
     # 책 소개
     article = soup.select_one('div.box_detail_article').text.strip('</br>').strip()
@@ -90,9 +96,9 @@ for index, book_page_url in enumerate(book_page_urls):
     bucket = storage.bucket()
 
     # 경로 지정
-    blob = bucket.blob('bookImages/'+str(ISBN13))
-    
-    # 메타데이터에 책 
+    blob = bucket.blob('bookImages/' + str(ISBN13))
+
+    # 메타데이터에 책
     metadata = {"book_title": title}
     blob.metadata = metadata
 
@@ -106,11 +112,11 @@ for index, book_page_url in enumerate(book_page_urls):
     book_info = {
         'title': title,
         'author': author,
-        'tag_list': tag,
+        'tag_list': tags,
         'article': article,
         'rank': rank,
         'url': url,
-        'image': image
+        'image': str(blob.public_url)
     }
 
     rank_info = {
@@ -119,7 +125,8 @@ for index, book_page_url in enumerate(book_page_urls):
         'rank': rank,
         'ISBN': ISBN13,
         'tag_list': tag,
-        'image': str(blob.public_url)
+        'image': str(blob.public_url),
+        'article': article
     }
 
     # 파이어베이스에 데이터 삽입하는 부분
@@ -130,7 +137,6 @@ for index, book_page_url in enumerate(book_page_urls):
     # 데이터를 끌어온 날짜(mmdd)의 랭킹 정보를 저장.
     rank_ref = db.reference('RANK/%s/%d' % (mmdd, index))
     rank_ref.set(rank_info)
-
 
     print(rank)
     print(title)
