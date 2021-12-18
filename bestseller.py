@@ -124,7 +124,7 @@ for index, book_page_url in enumerate(book_page_urls):
         'author': author,
         'rank': rank,
         'ISBN': ISBN13,
-        'tag_list': tag,
+        'tag_list': tags,
         'image': str(blob.public_url),
         'article': article
     }
